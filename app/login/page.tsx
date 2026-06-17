@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { signup } from '../auth/actions'
+import { login } from '../auth/actions'
 import { AuthCard, AuthInput, AuthButton } from '@/components/AuthComponents'
 
 interface FormErrors {
@@ -11,30 +11,26 @@ interface FormErrors {
   server?: string
 }
 
-export default function SignupPage() {
+export default function LoginPage() {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   
-  const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [errors, setErrors] = useState<FormErrors>({})
 
-  const isFormFilled = name.trim() !== '' && email.trim() !== '' && password.trim() !== ''
+  const isFormFilled = email.trim() !== '' && password.trim() !== ''
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setErrors({}) 
+    setErrors({})
 
     const localErrors: FormErrors = {}
     const cleanEmail = email.trim().toLowerCase()
 
+    // Immediate local institutional safety check
     if (!cleanEmail.endsWith('@uwaterloo.ca')) {
-      localErrors.email = 'Please register with a valid @uwaterloo.ca email.'
-    }
-
-    if (password.length < 8) {
-      localErrors.password = 'Password must be at least 8 characters long.'
+      localErrors.email = 'You must enter a valid @uwaterloo.ca email address.'
     }
 
     if (Object.keys(localErrors).length > 0) {
@@ -44,11 +40,10 @@ export default function SignupPage() {
 
     startTransition(async () => {
       const formData = new FormData()
-      formData.append('name', name.trim())
       formData.append('email', cleanEmail)
       formData.append('password', password)
 
-      const result = await signup(null, formData)
+      const result = await login(null, formData)
 
       if (result?.error) {
         setErrors({ server: result.error })
@@ -61,20 +56,12 @@ export default function SignupPage() {
 
   return (
     <AuthCard
-      subtitle="Create your account!"
-      footerText="Already have an account?"
-      footerLinkText="Log in"
-      footerHref="/login"
+      subtitle="Welcome back!"
+      footerText="Don't have an account?"
+      footerLinkText="Sign up"
+      footerHref="/signup"
     >
       <form onSubmit={handleFormSubmit} className="space-y-4 text-left">
-        <AuthInput
-          label="Full Name"
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="e.g. Sejal Agarwal"
-        />
-
         <AuthInput
           label="UWaterloo Email"
           type="text"
@@ -89,7 +76,7 @@ export default function SignupPage() {
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          placeholder="Min. 8 characters"
+          placeholder="••••••••"
           error={errors.password}
         />
 
@@ -102,8 +89,8 @@ export default function SignupPage() {
         <AuthButton
           isPending={isPending}
           disabled={!isFormFilled}
-          idleLabel="Sign Up"
-          pendingLabel="Creating your account..."
+          idleLabel="Log In"
+          pendingLabel="Verifying profile..."
         />
       </form>
     </AuthCard>

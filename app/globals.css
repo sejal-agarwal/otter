@@ -16,3 +16,22 @@
     -webkit-font-smoothing: antialiased;
   }
 }
+
+@keyframes otterSwim {
+  0% { transform: translateX(-4px) translateY(0px) rotate(-3deg); }
+  50% { transform: translateX(4px) translateY(-1px) rotate(3deg); }
+  100% { transform: translateX(-4px) translateY(0px) rotate(-3deg); }
+}
+
+@keyframes waveMorph {
+  0%, 100% { d: path("M0 2.5 Q 3 0, 6 2.5 T 12 2.5 T 18 2.5 T 24 2.5"); }
+  50% { d: path("M0 2.5 Q 3 4, 6 2.5 T 12 2.5 T 18 2.5 T 24 2.5"); }
+}
+
+.animate-swim {
+  animation: otterSwim 2.2s ease-in-out infinite;
+}
+
+.animate-squiggle {
+  animation: waveMorph 1.4s ease-in-out infinite;
+}

@@ -61,22 +61,3 @@ export function AuthInput({ label, error, ...props }: AuthInputProps) {
     </div>
   )
 }
-
-interface AuthButtonProps {
-  isPending: boolean
-  disabled: boolean
-  idleLabel: string
-  pendingLabel: string
-}
-
-export function AuthButton({ isPending, disabled, idleLabel, pendingLabel }: AuthButtonProps) {
-  return (
-    <button
-      type="submit"
-      disabled={disabled || isPending}
-      className="w-full rounded-2xl bg-forest-dark py-4 text-sm font-bold text-white transition duration-200 hover:opacity-80 active:scale-[0.98] shadow-lg mt-2 disabled:opacity-40 disabled:cursor-not-allowed"
-    >
-      {isPending ? pendingLabel : idleLabel}
-    </button>
-  )
-}

@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { signup } from '../auth/actions'
-import { AuthCard, AuthInput, AuthButton } from '@/components/AuthComponents'
+import { AuthCard, AuthInput } from '@/components/AuthComponents'
 import { Button } from '@/components/Button'
 
 interface FormErrors {

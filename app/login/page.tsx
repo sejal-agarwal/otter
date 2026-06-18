@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { login } from '../auth/actions'
 import { AuthCard, AuthInput, AuthButton } from '@/components/AuthComponents'
+import { Button } from '@/components/Button'
 
 interface FormErrors {
   email?: string
@@ -14,7 +15,7 @@ interface FormErrors {
 export default function LoginPage() {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
-  
+
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [errors, setErrors] = useState<FormErrors>({})
@@ -86,11 +87,13 @@ export default function LoginPage() {
           </p>
         )}
 
-        <AuthButton
+        <Button
+          type="submit"
           isPending={isPending}
           disabled={!isFormFilled}
-          idleLabel="Log In"
-          pendingLabel="Verifying profile..."
+          idleLabel="Log in"
+          pendingLabel="Verifying profile.."
+          className="mt-2"
         />
       </form>
     </AuthCard>

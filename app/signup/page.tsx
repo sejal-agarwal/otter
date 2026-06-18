@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { signup } from '../auth/actions'
 import { AuthCard, AuthInput, AuthButton } from '@/components/AuthComponents'
+import { Button } from '@/components/Button'
 
 interface FormErrors {
   email?: string
@@ -14,7 +15,7 @@ interface FormErrors {
 export default function SignupPage() {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
-  
+
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -24,7 +25,7 @@ export default function SignupPage() {
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setErrors({}) 
+    setErrors({})
 
     const localErrors: FormErrors = {}
     const cleanEmail = email.trim().toLowerCase()
@@ -99,11 +100,13 @@ export default function SignupPage() {
           </p>
         )}
 
-        <AuthButton
+        <Button
+          type="submit"
           isPending={isPending}
           disabled={!isFormFilled}
           idleLabel="Sign Up"
           pendingLabel="Creating your account..."
+          className="mt-2"
         />
       </form>
     </AuthCard>

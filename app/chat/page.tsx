@@ -106,16 +106,12 @@ export default function StudentChatPage() {
                     setSessions(userSessions)
 
                     if (userSessions.length > 0) {
-                        // Check if the browser remembers which chat you were just looking at
                         const rememberedSessionId = localStorage.getItem('otter_last_session_id')
-
-                        // Verify that the remembered session actually still exists in your active list
                         const sessionExists = userSessions.some(s => s.id === rememberedSessionId)
 
                         if (rememberedSessionId && sessionExists) {
                             setActiveSessionId(rememberedSessionId)
                         } else {
-                            // Fallback to the latest chat if nothing is saved or the saved chat was deleted
                             setActiveSessionId(userSessions[0].id)
                         }
                     }
@@ -187,7 +183,7 @@ export default function StudentChatPage() {
                 setSessions((prev) => prev.filter((s) => s.id !== sessionIdToDelete))
 
                 if (activeSessionId === sessionIdToDelete) {
-                    localStorage.removeItem('otter_last_session_id') // Wipe cache
+                    localStorage.removeItem('otter_last_session_id')
 
                     setSessions((updatedSessions) => {
                         if (updatedSessions.length > 0) {
@@ -286,7 +282,6 @@ export default function StudentChatPage() {
         setMessages((prev) => [...prev, userMsgPlaceholder])
 
         try {
-            // Persist User Message to database
             await supabase.from('messages').insert({
                 session_id: currentSessionId,
                 role: 'user',
@@ -294,7 +289,6 @@ export default function StudentChatPage() {
                 citations: currentCitations.length > 0 ? currentCitations : null
             })
 
-            // Send payload right to Next route pipeline
             const response = await fetch('/api/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -310,21 +304,20 @@ export default function StudentChatPage() {
             const data = await response.json()
 
             if (data.content) {
-                // Save Assistant Answer row to Database
                 await supabase.from('messages').insert({
                     session_id: currentSessionId,
                     role: 'assistant',
-                    content: data.content
+                    content: data.content,
+                    citations: data.citations 
                 })
 
-                // Append assistant answer locally
                 setMessages((prev) => [...prev, {
                     id: crypto.randomUUID(),
                     role: 'assistant',
-                    content: data.content
+                    content: data.content,
+                    citations: data.citations 
                 }])
 
-                // Update the dynamic titles correctly
                 if (data.title) {
                     await supabase.from('chat_sessions').update({ title: data.title }).eq('id', currentSessionId)
                     setSessions(prev => prev.map(s => s.id === currentSessionId ? { ...s, title: data.title } : s))
@@ -347,7 +340,6 @@ export default function StudentChatPage() {
             return
         }
 
-        // Safely open the document blob or base64 data stream in a spacious clean browser tab
         const newTab = window.open()
         if (newTab) {
             newTab.document.write(`
@@ -392,7 +384,7 @@ export default function StudentChatPage() {
 
                     <div className="flex items-center justify-between mb-6 flex-shrink-0">
                         <div className="flex items-center space-x-3">
-                            <Image src="/otter.png" alt="Otter" width={36} height={36} className="object-contain" />
+                            <Image src="/otter.png" alt="Letter O" width={36} height={36} className="object-contain" />
                             <span className="text-2xl font-normal tracking-wide">Otter</span>
                         </div>
 
@@ -437,7 +429,6 @@ export default function StudentChatPage() {
                                     <span className="truncate">{session.title}</span>
                                 </div>
 
-                                {/* Trash Can Icon Trigger: Hidden by default, reveals inline cleanly on parent group element hovers */}
                                 <span
                                     onClick={(e) => handleDeleteSession(e, session.id)}
                                     className={`opacity-0 group-hover:opacity-100 p-1 rounded-md transition duration-150 cursor-pointer flex-shrink-0 ${activeSessionId === session.id
@@ -464,7 +455,7 @@ export default function StudentChatPage() {
                             </div>
                             <span className="text-sm font-bold truncate text-white">{userName}</span>
                         </div>
-                        <p className="text-sm text-pebble-light opacity-90 flex-shrink-0">
+                        <div className="text-sm text-pebble-light opacity-90 flex-shrink-0">
                             <button
                                 onClick={async () => {
                                     await supabase.auth.signOut()
@@ -474,7 +465,7 @@ export default function StudentChatPage() {
                             >
                                 Log out
                             </button>
-                        </p>
+                        </div>
                     </div>
                 </div>
             </aside>
@@ -525,18 +516,15 @@ export default function StudentChatPage() {
                                                 : 'bg-white text-forest-dark rounded-tl-sm border border-forest-dark/5'
                                                 }`}
                                         >
-                                            {/* Persistent files */}
-                                            {msg.citations && msg.citations.length > 0 && (
-                                                <div className="flex flex-wrap gap-1.5 pb-0.5">
+                                            {/* User Upload Tray */}
+                                            {msg.citations && msg.citations.length > 0 && msg.role === 'user' && (
+                                                <div className="flex flex-wrap gap-1.5 pb-1">
                                                     {msg.citations.map((file, fIdx) => (
                                                         <button
                                                             key={fIdx}
                                                             type="button"
                                                             onClick={() => handleViewFile(file)}
-                                                            className={`text-[11px] font-medium rounded-lg px-2.5 py-1 flex items-center space-x-1.5 border transition max-w-[180px] truncate cursor-pointer ${msg.role === 'user'
-                                                                ? 'bg-white/10 border-white/20 text-white hover:bg-white/20'
-                                                                : 'bg-forest-dark/5 border-forest-dark/10 text-forest-dark hover:bg-forest-dark/10'
-                                                                }`}
+                                                            className="text-[11px] font-medium rounded-lg px-2.5 py-1 flex items-center space-x-1.5 border transition max-w-[180px] truncate cursor-pointer bg-white/10 border-white/20 text-white hover:bg-white/20"
                                                         >
                                                             <svg className="w-3 h-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                                                                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -547,7 +535,10 @@ export default function StudentChatPage() {
                                                 </div>
                                             )}
 
-                                            <div className="prose prose-sm max-w-none break-words">
+                                            {/* Unified, native ReactMarkdown component */}
+                                            <div className={`prose prose-sm max-w-none break-words leading-relaxed ${
+                                                msg.role === 'user' ? 'text-white prose-headings:text-white prose-strong:text-white' : 'text-forest-dark/90'
+                                            }`}>
                                                 <ReactMarkdown>{msg.content}</ReactMarkdown>
                                             </div>
                                         </div>

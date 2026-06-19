@@ -97,46 +97,63 @@ export default function MaterialsUploadPage() {
         setIsUploading(true)
 
         try {
-            for (const file of validFiles) {
-                const customStorageFileName = `${currentUserId}/${crypto.randomUUID()}-${file.name}`
+  for (const file of validFiles) {
+    const customStorageFileName = `${currentUserId}/${crypto.randomUUID()}-${file.name}`
+    
+    // Upload to Supabase Storage
+    const { error: storageErr } = await supabase.storage
+      .from('course-knowledge-base')
+      .upload(customStorageFileName, file, { cacheControl: '3600', upsert: false })
 
-                const { error: storageErr } = await supabase.storage
-                    .from('course-knowledge-base')
-                    .upload(customStorageFileName, file, { cacheControl: '3600', upsert: false })
+    if (storageErr) throw storageErr
 
-                if (storageErr) throw storageErr
+    // Insert into the course_materials table
+    const { data: insertedRow, error: tableErr } = await supabase
+      .from('course_materials')
+      .insert({
+        name: file.name,
+        type: file.type,
+        size: `${(file.size / 1024).toFixed(0)} KB`,
+        storage_path: customStorageFileName,
+        uploaded_by: currentUserId
+      })
+      .select()
+      .single()
 
-                const { data: insertedRow, error: tableErr } = await supabase
-                    .from('course_materials')
-                    .insert({
-                        name: file.name,
-                        type: file.type,
-                        size: `${(file.size / 1024).toFixed(0)} KB`,
-                        storage_path: customStorageFileName,
-                        uploaded_by: currentUserId
-                    })
-                    .select()
-                    .single()
+    if (tableErr) throw tableErr
 
-                if (tableErr) throw tableErr
+    // SECURE BLOCKING PIPELINE: Await the vector engine explicitly
+    const embedResponse = await fetch('/api/embed', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        materialId: insertedRow.id,
+        storagePath: customStorageFileName
+      })
+    })
 
-                const { data: urlData } = supabase.storage.from('course-knowledge-base').getPublicUrl(customStorageFileName)
+    const embedResult = await embedResponse.json()
+    
+    if (!embedResponse.ok || !embedResult.success) {
+      throw new Error(embedResult.error || 'Vector compilation broke down.')
+    }
+    const { data: urlData } = supabase.storage.from('course-knowledge-base').getPublicUrl(customStorageFileName)
 
-                setMaterials(prev => [{
-                    id: insertedRow.id,
-                    name: insertedRow.name,
-                    type: insertedRow.type,
-                    size: insertedRow.size,
-                    uploaded_at: insertedRow.created_at.split('T')[0],
-                    url: urlData.publicUrl
-                }, ...prev])
-            }
-        } catch (err) {
-            console.error('Ingestion failure exception pipeline breakdown:', err)
-            alert('Failed to securely index your document corpus.')
-        } finally {
-            setIsUploading(false)
-        }
+    setMaterials(prev => [{
+      id: insertedRow.id,
+      name: insertedRow.name,
+      type: insertedRow.type,
+      size: insertedRow.size,
+      uploaded_at: insertedRow.created_at.split('T')[0],
+      url: urlData.publicUrl
+    }, ...prev])
+  }
+} catch (err: any) {
+  console.error('Ingestion failure:', err)
+  alert(`Failed to parse your document corpus: ${err.message || err}`)
+} finally {
+  setIsUploading(false)
+}
     }
 
     const startRenaming = (e: React.MouseEvent, file: UploadedMaterial) => {
@@ -176,7 +193,6 @@ export default function MaterialsUploadPage() {
         }
     }
 
-    // REUSED INITIAL LOADING LAYOUT WITH OLLIE SWIMMING
     if (isLoading) {
         return (
             <div className="flex h-screen w-screen items-center justify-center bg-sage-border font-abeezee text-forest-dark">

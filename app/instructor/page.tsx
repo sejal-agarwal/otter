@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/utils/supabase/client'
-import { Button } from '@/components/Button'
+import { Button } from '@/components/Buttons'
 import { Header } from '@/components/Header'
 import { DashboardCard } from '@/components/DashboardCard'
 

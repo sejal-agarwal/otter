@@ -4,7 +4,7 @@ import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { signup } from '../auth/actions'
 import { AuthCard, AuthInput } from '@/components/AuthComponents'
-import { Button } from '@/components/Button'
+import { Button } from '@/components/Buttons'
 
 interface FormErrors {
   email?: string

@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { createClient } from '@/utils/supabase/client'
-import { Button } from '@/components/Button'
+import { Button, ReturnToInstructorConsoleButton } from '@/components/Buttons'
 import ReactMarkdown from 'react-markdown'
 
 interface CitationFile {
@@ -494,17 +494,7 @@ export default function StudentChatPage() {
             <main className="flex-1 flex flex-col h-full bg-sage-border relative overflow-hidden">
 
                 {isInstructor && (
-                    <div className="absolute top-4 left-0 right-0 z-20 flex justify-center select-none pointer-events-none">
-                        <button
-                            onClick={() => router.push('/instructor')}
-                            className="pointer-events-auto text-xs font-bold bg-jade-accent text-white px-4 py-2 rounded-full shadow-md hover:bg-forest-dark border border-white/10 flex items-center space-x-1.5 transition active:scale-95 cursor-pointer"
-                        >
-                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7 7-7m8 14l-7-7 7-7" />
-                            </svg>
-                            <span>Return to Instructor Console</span>
-                        </button>
-                    </div>
+                    <ReturnToInstructorConsoleButton />
                 )}
 
                 <div className="w-full h-[calc(100vh-130px)] overflow-y-auto min-h-0 pt-20 scrollbar-thin scrollbar-thumb-forest-dark/50 scrollbar-track-transparent">

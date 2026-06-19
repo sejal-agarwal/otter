@@ -88,7 +88,7 @@ export default function InstructorDashboard() {
               </svg>
             }
           >
-            <Button idleLabel="Launch Sandbox Chat" onClick={() => router.push('/instructor/chat')} />
+            <Button idleLabel="Launch Sandbox Chat" onClick={() => router.push('/chat')} />
           </DashboardCard>
 
           {/* CARD 3: Student Insights Dashboard */}
@@ -105,7 +105,7 @@ export default function InstructorDashboard() {
           </DashboardCard>
 
         </div>
-        
+
         <div className="flex-[1.5] hidden md:block min-h-[40px] max-h-[140px]" />
 
       </div>

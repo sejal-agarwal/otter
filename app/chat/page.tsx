@@ -29,6 +29,8 @@ export default function StudentChatPage() {
     const supabase = createClient()
     const router = useRouter()
 
+    const [isInstructor, setIsInstructor] = useState(false)
+
     const [isLoading, setIsLoading] = useState(true)
     const [isSending, setIsSending] = useState(false)
     const [userName, setUserName] = useState('')
@@ -69,13 +71,27 @@ export default function StudentChatPage() {
                 // Fetch name
                 if (user.user_metadata?.name) {
                     setUserName(user.user_metadata.name)
+
+                    const { data: profile } = await supabase
+                        .from('profiles')
+                        .select('role')
+                        .eq('id', user.id)
+                        .single()
+
+                    if (profile?.role === 'INSTRUCTOR') {
+                        setIsInstructor(true)
+                    }
                 } else {
                     const { data: profile } = await supabase
                         .from('profiles')
-                        .select('name')
+                        .select('name, role')
                         .eq('id', user.id)
                         .single()
                     setUserName(profile?.name || 'User Account')
+
+                    if (profile?.role === 'INSTRUCTOR') {
+                        setIsInstructor(true)
+                    }
                 }
 
                 // Fetch user's past chat sessions
@@ -476,6 +492,20 @@ export default function StudentChatPage() {
 
             {/* Main conversation frame */}
             <main className="flex-1 flex flex-col h-full bg-sage-border relative overflow-hidden">
+
+                {isInstructor && (
+                    <div className="absolute top-4 left-0 right-0 z-20 flex justify-center select-none pointer-events-none">
+                        <button
+                            onClick={() => router.push('/instructor')}
+                            className="pointer-events-auto text-xs font-bold bg-jade-accent text-white px-4 py-2 rounded-full shadow-md hover:bg-forest-dark border border-white/10 flex items-center space-x-1.5 transition active:scale-95 cursor-pointer"
+                        >
+                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7 7-7m8 14l-7-7 7-7" />
+                            </svg>
+                            <span>Return to Instructor Console</span>
+                        </button>
+                    </div>
+                )}
 
                 <div className="w-full h-[calc(100vh-130px)] overflow-y-auto min-h-0 pt-20 scrollbar-thin scrollbar-thumb-forest-dark/50 scrollbar-track-transparent">
                     <div className="w-full max-w-3xl mx-auto px-6 md:px-12">

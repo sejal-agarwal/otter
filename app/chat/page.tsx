@@ -355,7 +355,7 @@ export default function StudentChatPage() {
     }
 
     return (
-        <div className="flex h-screen w-screen bg-sage-border overflow-hidden font-abeezee text-forest-dark select-none relative">
+        <div className="flex h-screen w-screen bg-sage-border overflow-hidden font-abeezee text-forest-dark relative">
 
             {/* Mobile Panel */}
             {isSidebarOpen && (

@@ -43,7 +43,6 @@ export default function MaterialsUploadPage() {
 
                 if (profileError || profile?.role !== 'INSTRUCTOR') return router.push('/chat')
 
-                // Fetch saved materials directly from database table
                 const { data: dbFiles, error: dbError } = await supabase
                     .from('course_materials')
                     .select('*')
@@ -147,7 +146,6 @@ export default function MaterialsUploadPage() {
 
     const saveNewName = async (id: string) => {
         if (!editNameValue.trim()) return
-        const lastDotIdx = editNameValue.lastIndexOf('.')
         let finalizedName = editNameValue.trim()
 
         const { error } = await supabase
@@ -186,10 +184,10 @@ export default function MaterialsUploadPage() {
     }
 
     return (
-        <div className="h-screen w-screen bg-sage-border font-abeezee text-forest-dark flex flex-col overflow-hidden relative">
+        <div className="min-h-screen w-screen bg-sage-border font-abeezee text-forest-dark flex flex-col overflow-y-auto relative scrollbar-thin scrollbar-thumb-forest-dark/50 scrollbar-track-transparent">
             <ReturnToInstructorConsoleButton />
 
-            <div className="flex-1 w-full flex flex-col px-6 pt-24 pb-12 max-w-4xl mx-auto overflow-hidden">
+            <div className="flex-1 w-full flex flex-col px-6 pt-24 pb-16 max-w-4xl mx-auto">
 
                 <div className="w-full text-left select-none pb-8 flex-shrink-0">
                     <h1 className="text-2xl md:text-3xl font-normal tracking-wide text-forest-dark">Knowledge Base Manager</h1>
@@ -199,7 +197,7 @@ export default function MaterialsUploadPage() {
                 <div
                     onDragEnter={handleDrag} onDragOver={handleDrag} onDragLeave={handleDrag} onDrop={handleDrop}
                     onClick={() => fileInputRef.current?.click()}
-                    className={`w-full border-2 border-dashed rounded-[2.5rem] p-10 text-center flex flex-col items-center justify-center cursor-pointer transition ${dragActive ? 'border-white bg-jade-accent text-white scale-[0.99]' : 'border-jade-accent/30 bg-jade-accent text-white shadow-2xl hover:scale-[1.005]'
+                    className={`w-full border-2 border-dashed rounded-[2.5rem] p-10 text-center flex flex-col items-center justify-center cursor-pointer transition flex-shrink-0 ${dragActive ? 'border-white bg-jade-accent text-white scale-[0.99]' : 'border-jade-accent/30 bg-jade-accent text-white shadow-2xl hover:scale-[1.005]'
                         }`}
                 >
                     <input type="file" ref={fileInputRef} onChange={(e) => e.target.files && processFiles(e.target.files)} accept="image/*,application/pdf" multiple className="hidden" />
@@ -213,84 +211,67 @@ export default function MaterialsUploadPage() {
                     </div>
                 </div>
 
-                {/* Dynamic Corpus Table Grid */}
-                <div className="flex-1 w-full flex flex-col min-h-0 mt-8">
+                <div className="w-full flex flex-col mt-8">
                     <p className="text-[11px] uppercase font-bold tracking-widest text-forest-dark/40 mb-3 pl-1 select-none">Active Database Index ({materials.length} items)</p>
-                    <div className="flex-1 w-full bg-pebble-light/60 border border-forest-dark/5 shadow-xl rounded-[2rem] overflow-hidden flex flex-col">
-                        <div className="flex-1 overflow-y-auto scrollbar-thin">
-                            {materials.length > 0 ? (
-                                <div className="divide-y divide-forest-dark/5">
-                                    {materials.map((file) => (
-                                        <div
-                                            key={file.id}
-                                            onClick={() => editingId !== file.id && window.open(file.url, '_blank')}
-                                            className={`p-4 md:px-6 flex items-center justify-between text-sm transition group ${editingId === file.id ? 'bg-white/40' : 'hover:bg-white/30 cursor-pointer'}`}
-                                        >
-                                            <div className="flex items-center space-x-3.5 truncate flex-1 max-w-[75%]">
-                                                <div className="p-2 rounded-lg bg-forest-dark/5 text-forest-dark/70 flex-shrink-0">
-                                                    {file.type === 'application/pdf' ? (
-                                                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                                                    ) : (
-                                                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                                                    )}
-                                                </div>
 
-                                                {editingId === file.id ? (
-                                                    <div className="flex items-center space-x-2 w-full" onClick={(e) => e.stopPropagation()}>
-                                                        <input type="text" value={editNameValue} onChange={(e) => setEditNameValue(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && saveNewName(file.id)} className="bg-white border text-xs font-bold rounded-lg px-3 py-1.5 outline-none focus:ring-2 focus:ring-jade-accent w-full max-w-sm text-forest-dark" autoFocus />
-                                                        <button onClick={() => saveNewName(file.id)} className="px-3 py-1.5 bg-forest-dark text-white text-xs font-bold rounded-lg transition hover:opacity-90 shadow-sm">Save</button>
-                                                        <button onClick={() => setEditingId(null)} className="px-3 py-1.5 bg-forest-dark/5 text-forest-dark text-xs font-bold rounded-lg transition hover:bg-forest-dark/10">Cancel</button>
-                                                    </div>
+                    <div className="w-full bg-pebble-light/60 border border-forest-dark/5 shadow-xl rounded-[2rem] overflow-hidden">
+                        {materials.length > 0 ? (
+                            <div className="divide-y divide-forest-dark/5">
+                                {materials.map((file) => (
+                                    <div
+                                        key={file.id}
+                                        onClick={() => editingId !== file.id && window.open(file.url, '_blank')}
+                                        className={`p-4 md:px-6 flex items-center justify-between text-sm transition group ${editingId === file.id ? 'bg-white/40' : 'hover:bg-white/30 cursor-pointer'}`}
+                                    >
+                                        <div className="flex items-center space-x-3.5 truncate flex-1 max-w-[75%]">
+                                            <div className="p-2 rounded-lg bg-forest-dark/5 text-forest-dark/70 flex-shrink-0">
+                                                {file.type === 'application/pdf' ? (
+                                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                                                 ) : (
-                                                    <div className="truncate flex flex-col">
-                                                        <span className="font-bold text-forest-dark truncate flex items-center pr-2">
-                                                            <span className="truncate group-hover:text-jade-accent transition-colors duration-150">
-                                                                {file.name}
-                                                            </span>
-
-                                                            <svg
-                                                                onClick={(e) => startRenaming(e, file)}
-                                                                className="ml-2.5 w-3.5 h-3.5 text-forest-dark/30 group-hover:text-jade-accent transition-all duration-200 transform hover:scale-125 cursor-pointer flex-shrink-0 min-w-[14px]"
-                                                                fill="none"
-                                                                viewBox="0 0 24 24"
-                                                                stroke="currentColor"
-                                                                strokeWidth={2.5}
-                                                            >
-                                                                <title>Rename Document File</title>
-                                                                <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" />
-                                                            </svg>
-                                                        </span>
-                                                        <span className="text-[10px] text-forest-dark/40 font-medium">{file.size} • Embedded on {file.uploaded_at}</span>
-                                                    </div>
+                                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                                                 )}
                                             </div>
-                                            <button
-                                                onClick={(e) => handleRemoveFile(e, file)}
-                                                className="opacity-0 group-hover:opacity-100 p-1 rounded-md transition duration-150 cursor-pointer flex-shrink-0 hover:bg-forest-dark/20 text-forest-dark/40 hover:text-forest-dark"
-                                                title="Delete Discussion"
-                                            >
-                                                <svg
-                                                    className="w-4 h-4"
-                                                    fill="none"
-                                                    viewBox="0 0 24 24"
-                                                    stroke="currentColor"
-                                                    strokeWidth={2}
-                                                >
-                                                    <path
-                                                        strokeLinecap="round"
-                                                        strokeLinejoin="round"
-                                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                                                    />
-                                                </svg>
-                                            </button></div>
-                                    ))}
-                                </div>
-                            ) : (
-                                <div className="h-full min-h-[240px] flex flex-col items-center justify-center text-center select-none opacity-40">
-                                    <p className="text-sm font-bold">Your master reference database is currently empty.</p>
-                                </div>
-                            )}
-                        </div>
+
+                                            {editingId === file.id ? (
+                                                <div className="flex items-center space-x-2 w-full" onClick={(e) => e.stopPropagation()}>
+                                                    <input type="text" value={editNameValue} onChange={(e) => setEditNameValue(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && saveNewName(file.id)} className="bg-white border text-xs font-bold rounded-lg px-3 py-1.5 outline-none focus:ring-2 focus:ring-jade-accent w-full max-w-sm text-forest-dark" autoFocus />
+                                                    <button onClick={() => saveNewName(file.id)} className="px-3 py-1.5 bg-forest-dark text-white text-xs font-bold rounded-lg transition hover:opacity-90 shadow-sm">Save</button>
+                                                    <button onClick={() => setEditingId(null)} className="px-3 py-1.5 bg-forest-dark/5 text-forest-dark text-xs font-bold rounded-lg transition hover:bg-forest-dark/10">Cancel</button>
+                                                </div>
+                                            ) : (
+                                                <div className="truncate flex flex-col">
+                                                    <span className="font-bold text-forest-dark truncate flex items-center pr-2">
+                                                        <span className="truncate group-hover:text-jade-accent transition-colors duration-150">{file.name}</span>
+
+                                                        <svg
+                                                            onClick={(e) => startRenaming(e, file)}
+                                                            className="ml-2.5 w-3.5 h-3.5 text-forest-dark/30 group-hover:text-jade-accent transition-all duration-200 transform hover:scale-125 cursor-pointer flex-shrink-0 min-w-[14px]"
+                                                            fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}
+                                                        >
+                                                            <title>Rename Document File</title>
+                                                            <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" />
+                                                        </svg>
+                                                    </span>
+                                                    <span className="text-[10px] text-forest-dark/40 font-medium">{file.size} • Embedded on {file.uploaded_at}</span>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        <button
+                                            onClick={(e) => handleRemoveFile(e, file)}
+                                            className="opacity-0 group-hover:opacity-100 p-1 rounded-md transition duration-150 cursor-pointer flex-shrink-0 hover:bg-forest-dark/20 text-forest-dark/40 hover:text-forest-dark"
+                                            title="Remove from tracking"
+                                        >
+                                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="w-full min-h-[240px] flex flex-col items-center justify-center text-center select-none opacity-40">
+                                <p className="text-sm font-bold">Your master reference database is currently empty.</p>
+                            </div>
+                        )}
                     </div>
                 </div>
 

@@ -50,18 +50,25 @@ export default function InstructorDashboard() {
     <div className="h-screen w-screen bg-sage-border font-abeezee text-forest-dark flex flex-col overflow-hidden relative">
       <Header />
 
-      <div className="flex-1 w-full flex flex-col justify-center items-center px-6 relative max-w-4xl mx-auto">
+      <div className="flex-1 w-full flex flex-col px-6 max-w-6xl mx-auto overflow-y-auto md:overflow-hidden">
         
-        <div className="absolute top-35 left-6 right-6 text-left select-none">
-          <h1 className="text-3xl font-normal tracking-wide text-forest-dark">Welcome back, {instructorName}</h1>
-          <p className="text-xs text-forest-dark/60 font-medium mt-1">Instructor Management Console</p>
+        <div className="flex-1 hidden md:block min-h-[40px] max-h-[100px]" />
+
+        <div className="w-full text-left select-none pt-8 md:pt-0 pb-6 md:pb-8">
+          <h1 className="text-2xl md:text-3xl font-normal tracking-wide text-forest-dark break-words">
+            Welcome back, {instructorName}
+          </h1>
+          <p className="text-xs text-forest-dark/60 font-medium mt-1">
+            Instructor Management Console
+          </p>
         </div>
 
-        <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch mt-16 animate-fade-in">
+        <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch pb-12 md:pb-0 animate-fade-in">
           
+          {/* CARD 1: Upload course materials */}
           <DashboardCard
             title="Upload Course Materials"
-            description="Feed Ollie the system knowledge base. Upload course notes, slide decks, or syllabi to expand local RAG context parameters."
+            description="Upload course notes, slide decks, or syllabi to expand local RAG context parameters."
             icon={
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
@@ -71,6 +78,20 @@ export default function InstructorDashboard() {
             <Button idleLabel="Manage Materials" onClick={() => router.push('/instructor/upload')} />
           </DashboardCard>
 
+          {/* NEW CARD 2: Test Assistant Chat Space */}
+          <DashboardCard
+            title="Test Chat Interface"
+            description="Verify response accuracy, test core prompts, and preview the student layout workspace."
+            icon={
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+              </svg>
+            }
+          >
+            <Button idleLabel="Launch Sandbox Chat" onClick={() => router.push('/instructor/chat')} />
+          </DashboardCard>
+
+          {/* CARD 3: Student Insights Dashboard */}
           <DashboardCard
             title="Student Insights Dashboard"
             description="Analyze aggregated, fully anonymized student queries and topic clusters. Track confused concepts without compromising user identity metrics."
@@ -84,6 +105,9 @@ export default function InstructorDashboard() {
           </DashboardCard>
 
         </div>
+        
+        <div className="flex-[1.5] hidden md:block min-h-[40px] max-h-[140px]" />
+
       </div>
     </div>
   )

@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/utils/supabase/client'
 import { ReturnToInstructorConsoleButton } from '@/components/Buttons'
+import { LoadingOtter } from '@/components/LoadingOtter'
 
 interface UploadedMaterial {
     id: string
@@ -175,6 +176,7 @@ export default function MaterialsUploadPage() {
         }
     }
 
+    // REUSED INITIAL LOADING LAYOUT WITH OLLIE SWIMMING
     if (isLoading) {
         return (
             <div className="flex h-screen w-screen items-center justify-center bg-sage-border font-abeezee text-forest-dark">
@@ -201,19 +203,23 @@ export default function MaterialsUploadPage() {
                         }`}
                 >
                     <input type="file" ref={fileInputRef} onChange={(e) => e.target.files && processFiles(e.target.files)} accept="image/*,application/pdf" multiple className="hidden" />
-                    <div className="space-y-4 max-w-sm pointer-events-none select-none">
-                        <div className="w-14 h-14 rounded-2xl mx-auto bg-white/10 text-white flex items-center justify-center">
-                            {isUploading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white animate-spin rounded-full" /> : (
-                                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
-                            )}
-                        </div>
-                        <h3 className="text-lg font-bold tracking-wide">{isUploading ? 'Embedding document files...' : 'Drag & drop course materials'}</h3>
+
+                    <div className="space-y-4 max-w-sm pointer-events-none select-none flex flex-col items-center">
+                        {isUploading ? (
+                            <LoadingOtter message="Ollie is swimming through document files..." />
+                        ) : (
+                            <>
+                                <div className="w-12 h-12 rounded-2xl mx-auto bg-white/10 text-white flex items-center justify-center">
+                                    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
+                                </div>
+                                <h3 className="text-lg font-bold tracking-wide">Drag & drop course materials</h3>
+                            </>
+                        )}
                     </div>
                 </div>
 
                 <div className="w-full flex flex-col mt-8">
                     <p className="text-[11px] uppercase font-bold tracking-widest text-forest-dark/40 mb-3 pl-1 select-none">Active Database Index ({materials.length} items)</p>
-
                     <div className="w-full bg-pebble-light/60 border border-forest-dark/5 shadow-xl rounded-[2rem] overflow-hidden">
                         {materials.length > 0 ? (
                             <div className="divide-y divide-forest-dark/5">

@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { createClient } from '@/utils/supabase/client'
 import { Button, ReturnToInstructorConsoleButton } from '@/components/Buttons'
 import ReactMarkdown from 'react-markdown'
+import { LoadingOtter } from '@/components/LoadingOtter'
 
 interface CitationFile {
     name: string
@@ -552,19 +553,14 @@ export default function StudentChatPage() {
                                         </div>
                                     </div>
                                 ))}
-
                                 {isSending && (
                                     <div className="flex w-full flex-col items-start">
-                                        <div className="text-[10px] font-bold text-forest-dark/50 uppercase tracking-widest mb-1.5 px-1 flex items-center space-x-3">
-                                            <div className="flex flex-col items-center justify-end w-6 h-6.5 relative">
-                                                <div className="relative w-5 h-5 opacity-90 animate-swim bottom-[-1px] z-10">
-                                                    <Image src="/otter.png" alt="Ollie" fill className="object-contain" />
-                                                </div>
-                                                <svg className="w-6 h-1.5 text-blue-400/70 relative z-0" viewBox="0 0 24 5" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round">
-                                                    <path className="animate-squiggle" d="M0 2.5 Q 3 0, 6 2.5 T 12 2.5 T 18 2.5 T 24 2.5" />
-                                                </svg>
-                                            </div>
-                                            <span className="pt-1 animate-pulse">Ollie is swimming through ideas...</span>
+                                        <div className="text-[10px] font-bold text-forest-dark/50 uppercase tracking-widest mb-1.5 px-1 flex items-center">
+                                            <LoadingOtter
+                                                size="small"
+                                                message="Ollie is swimming through ideas..."
+                                                className="flex-row space-x-2 items-center"
+                                            />
                                         </div>
                                     </div>
                                 )}

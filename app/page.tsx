@@ -8,7 +8,7 @@ import { Button } from '@/components/Buttons'
 export default function HomePage() {
   const router = useRouter()
 
-  const phrases = ["Syllabus Navigation.", "Course Content Relevant Answers", "Smart RAG Interactions.", "Aggregated Class Insights."]
+  const phrases = ["Syllabus Navigation.", "Course Content Relevant Answers.", "Smart RAG Interactions.", "Aggregated Class Insights."]
   const [displayText, setDisplayText] = useState('')
   const [phraseIdx, setPhraseIdx] = useState(0)
   const [isDeleting, setIsDeleting] = useState(false)

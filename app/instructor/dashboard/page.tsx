@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/utils/supabase/client'
 import { Header } from '@/components/Header'
+import { LoadingOtter } from '@/components/LoadingOtter'
 
 interface MetricState {
     totalQueries: number
@@ -25,6 +26,9 @@ export default function StudentInsightsDashboard() {
         commonKeywords: [],
         recentQueries: []
     })
+
+    const [aiSummary, setAiSummary] = useState<string>('')
+    const [isAiLoading, setIsAiLoading] = useState<boolean>(true)
 
     useEffect(() => {
         async function fetchInsights() {
@@ -100,6 +104,22 @@ export default function StudentInsightsDashboard() {
         fetchInsights()
     }, [router, supabase])
 
+    useEffect(() => {
+        async function getAiSummary() {
+            try {
+                const res = await fetch('/api/instructor/summary')
+                const data = await res.json()
+                setAiSummary(data.summary || 'No summary available.')
+            } catch (err) {
+                console.error('Failed to load AI summary:', err)
+                setAiSummary('Failed to compile weekly analytics summary.')
+            } finally {
+                setIsAiLoading(false)
+            }
+        }
+        getAiSummary()
+    }, [])
+
     if (isLoading) {
         return (
             <div className="flex h-screen w-screen items-center justify-center bg-sage-border font-abeezee text-forest-dark">
@@ -158,6 +178,30 @@ export default function StudentInsightsDashboard() {
 
                 {/* --- LOWER DETAILS ROW --- */}
                 <div className="grid grid-cols-1 md:grid-cols-5 gap-6 items-start">
+
+                    {/* --- AI weekly summary container --- */}
+                    <div className="w-full md:col-span-5 bg-forest-dark text-pebble-light p-6 rounded-2xl mb-2 border border-forest-dark/20 shadow-md relative">
+                        <div className="flex items-center gap-2 mb-4">
+                            <h2 className="text-sm font-bold uppercase tracking-wider opacity-90">Summary of Student Queries</h2>
+                            <span className="bg-jade-accent text-forest-dark text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-sm">
+                                AI Insights
+                            </span>
+                        </div>
+
+                        {isAiLoading ? (
+                            <div className="py-6 flex items-center justify-center">
+                                <LoadingOtter
+                                    size="normal"
+                                    message="Ollie is summarizing student queries from the past week..."
+                                    className="text-pebble-light"
+                                />
+                            </div>
+                        ) : (
+                            <div className="text-xs md:text-sm leading-relaxed opacity-90 font-light whitespace-pre-line space-y-1">
+                                {aiSummary}
+                            </div>
+                        )}
+                    </div>
 
                     {/* Left Side: Keywords Distribution */}
                     <div className="md:col-span-2 bg-pebble-light/30 border border-sage-border/60 rounded-2xl p-6">

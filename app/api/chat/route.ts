@@ -36,7 +36,7 @@ export async function POST(req: Request) {
         {
           query_embedding: queryVector,
           match_threshold: 0.35, // Adjust similarity tolerances
-          match_count: 5         // Feed top 5 chunks
+          match_count: 5 // Feed top 5 chunks
         }
       )
 

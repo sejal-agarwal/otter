@@ -66,7 +66,7 @@ export default function StudentInsightsDashboard() {
                     ? parseFloat((safeQueries.length / uniqueStudents).toFixed(1))
                     : 0;
 
-                const stopWords = new Set(['what', 'is', 'the', 'how', 'to', 'a', 'an', 'and', 'for', 'in', 'of', 'on', 'with', 'my', 'can', 'you', 'i', 'this', 'that'])
+                const stopWords = new Set(['what', 'is', 'the', 'how', 'to', 'a', 'an', 'and', 'for', 'in', 'of', 'on', 'with', 'my', 'can', 'you', 'i', 'this', 'that', 'are', 'most'])
                 const wordCounts: Record<string, number> = {}
 
                 safeQueries.forEach(query => {

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/utils/supabase/client'
 import { ReturnToInstructorConsoleButton } from '@/components/Buttons'
 import { LoadingOtter } from '@/components/LoadingOtter'
+import { Header } from '@/components/Header'
 
 interface UploadedMaterial {
     id: string
@@ -97,63 +98,63 @@ export default function MaterialsUploadPage() {
         setIsUploading(true)
 
         try {
-  for (const file of validFiles) {
-    const customStorageFileName = `${currentUserId}/${crypto.randomUUID()}-${file.name}`
-    
-    // Upload to Supabase Storage
-    const { error: storageErr } = await supabase.storage
-      .from('course-knowledge-base')
-      .upload(customStorageFileName, file, { cacheControl: '3600', upsert: false })
+            for (const file of validFiles) {
+                const customStorageFileName = `${currentUserId}/${crypto.randomUUID()}-${file.name}`
 
-    if (storageErr) throw storageErr
+                // Upload to Supabase Storage
+                const { error: storageErr } = await supabase.storage
+                    .from('course-knowledge-base')
+                    .upload(customStorageFileName, file, { cacheControl: '3600', upsert: false })
 
-    // Insert into the course_materials table
-    const { data: insertedRow, error: tableErr } = await supabase
-      .from('course_materials')
-      .insert({
-        name: file.name,
-        type: file.type,
-        size: `${(file.size / 1024).toFixed(0)} KB`,
-        storage_path: customStorageFileName,
-        uploaded_by: currentUserId
-      })
-      .select()
-      .single()
+                if (storageErr) throw storageErr
 
-    if (tableErr) throw tableErr
+                // Insert into the course_materials table
+                const { data: insertedRow, error: tableErr } = await supabase
+                    .from('course_materials')
+                    .insert({
+                        name: file.name,
+                        type: file.type,
+                        size: `${(file.size / 1024).toFixed(0)} KB`,
+                        storage_path: customStorageFileName,
+                        uploaded_by: currentUserId
+                    })
+                    .select()
+                    .single()
 
-    // SECURE BLOCKING PIPELINE: Await the vector engine explicitly
-    const embedResponse = await fetch('/api/embed', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        materialId: insertedRow.id,
-        storagePath: customStorageFileName
-      })
-    })
+                if (tableErr) throw tableErr
 
-    const embedResult = await embedResponse.json()
-    
-    if (!embedResponse.ok || !embedResult.success) {
-      throw new Error(embedResult.error || 'Vector compilation broke down.')
-    }
-    const { data: urlData } = supabase.storage.from('course-knowledge-base').getPublicUrl(customStorageFileName)
+                // SECURE BLOCKING PIPELINE: Await the vector engine explicitly
+                const embedResponse = await fetch('/api/embed', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        materialId: insertedRow.id,
+                        storagePath: customStorageFileName
+                    })
+                })
 
-    setMaterials(prev => [{
-      id: insertedRow.id,
-      name: insertedRow.name,
-      type: insertedRow.type,
-      size: insertedRow.size,
-      uploaded_at: insertedRow.created_at.split('T')[0],
-      url: urlData.publicUrl
-    }, ...prev])
-  }
-} catch (err: any) {
-  console.error('Ingestion failure:', err)
-  alert(`Failed to parse your document corpus: ${err.message || err}`)
-} finally {
-  setIsUploading(false)
-}
+                const embedResult = await embedResponse.json()
+
+                if (!embedResponse.ok || !embedResult.success) {
+                    throw new Error(embedResult.error || 'Vector compilation broke down.')
+                }
+                const { data: urlData } = supabase.storage.from('course-knowledge-base').getPublicUrl(customStorageFileName)
+
+                setMaterials(prev => [{
+                    id: insertedRow.id,
+                    name: insertedRow.name,
+                    type: insertedRow.type,
+                    size: insertedRow.size,
+                    uploaded_at: insertedRow.created_at.split('T')[0],
+                    url: urlData.publicUrl
+                }, ...prev])
+            }
+        } catch (err: any) {
+            console.error('Ingestion failure:', err)
+            alert(`Failed to parse your document corpus: ${err.message || err}`)
+        } finally {
+            setIsUploading(false)
+        }
     }
 
     const startRenaming = (e: React.MouseEvent, file: UploadedMaterial) => {
@@ -203,9 +204,13 @@ export default function MaterialsUploadPage() {
 
     return (
         <div className="min-h-screen w-screen bg-sage-border font-abeezee text-forest-dark flex flex-col overflow-y-auto relative scrollbar-thin scrollbar-thumb-forest-dark/50 scrollbar-track-transparent">
-            <ReturnToInstructorConsoleButton />
+            <Header />
 
-            <div className="flex-1 w-full flex flex-col px-6 pt-24 pb-16 max-w-4xl mx-auto">
+            <div className="relative w-full h-12 flex-shrink-0 mt-4">
+                <ReturnToInstructorConsoleButton />
+            </div>
+
+            <div className="flex-1 w-full flex flex-col px-6 pt-12 pb-16 max-w-4xl mx-auto">
 
                 <div className="w-full text-left select-none pb-8 flex-shrink-0">
                     <h1 className="text-2xl md:text-3xl font-normal tracking-wide text-forest-dark">Knowledge Base Manager</h1>

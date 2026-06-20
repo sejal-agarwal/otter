@@ -26,14 +26,13 @@ export default function StudentInsightsDashboard() {
         commonKeywords: [],
         recentQueries: []
     })
-
+    
     const [aiSummary, setAiSummary] = useState<string>('')
     const [isAiLoading, setIsAiLoading] = useState<boolean>(true)
 
     useEffect(() => {
         async function fetchInsights() {
             try {
-                // 1. Authenticate Instructor Session
                 const { data: { user }, error: authError } = await supabase.auth.getUser()
                 if (authError || !user) return router.push('/login')
 
@@ -45,25 +44,28 @@ export default function StudentInsightsDashboard() {
 
                 if (profileError || profile?.role !== 'INSTRUCTOR') return router.push('/chat')
 
-                // 2. Query the scalable database view directly
-                const { data: viewData, error: viewError } = await supabase
+                const { data, error: viewError } = await supabase
                     .from('student_queries_view')
                     .select('*')
                     .order('created_at', { ascending: false })
 
                 if (viewError) throw viewError
 
-                const safeQueries = viewData || []
+                const viewData = data as Array<{
+                    message_id: string;
+                    content: string;
+                    created_at: string;
+                    session_id: string;
+                    student_id: string;
+                }> | null;
 
-                // 3. Calculate Distinct Active Student Count
+                const safeQueries = viewData || []
                 const uniqueStudents = new Set(safeQueries.map(q => q.student_id)).size
 
-                // 4. Calculate Average Queries per Student
                 const avgQueriesPerStudent = safeQueries.length > 0
                     ? parseFloat((safeQueries.length / uniqueStudents).toFixed(1))
                     : 0;
 
-                // 5. Client-side NLP keyword frequency mapping (ignoring common stop words)
                 const stopWords = new Set(['what', 'is', 'the', 'how', 'to', 'a', 'an', 'and', 'for', 'in', 'of', 'on', 'with', 'my', 'can', 'you', 'i', 'this', 'that'])
                 const wordCounts: Record<string, number> = {}
 
@@ -81,7 +83,6 @@ export default function StudentInsightsDashboard() {
                     .slice(0, 5)
                     .map(([word, count]) => ({ word, count }))
 
-                // Map data safely to State structure
                 setMetrics({
                     totalQueries: safeQueries.length,
                     activeStudents: uniqueStudents,
@@ -132,10 +133,23 @@ export default function StudentInsightsDashboard() {
         <div className="h-screen w-screen bg-sage-border font-abeezee text-forest-dark flex flex-col overflow-hidden relative">
             <Header />
 
-            <div className="flex-1 w-full flex flex-col px-6 max-w-6xl mx-auto overflow-y-auto pb-10">
+            {/* --- MOBILE ONLY FIXED TOP LAYER --- */}
+            <div className="md:hidden fixed top-16 left-0 right-0 z-30 flex justify-center bg-sage-border/90 backdrop-blur-md py-3 px-4 border-b border-forest-dark/10 shadow-xs">
+                <button
+                    onClick={() => router.push('/instructor')}
+                    className="w-full text-center text-xs font-bold bg-jade-accent text-white px-4 py-2.5 rounded-full shadow-sm hover:bg-forest-dark border border-white/10 flex items-center justify-center space-x-1.5 transition active:scale-95 cursor-pointer"
+                >
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7 7-7m8 14l-7-7 7-7" />
+                    </svg>
+                    <span>Return to Instructor Console</span>
+                </button>
+            </div>
 
-                {/* Top Header Row */}
-                <div className="w-full flex items-center justify-between pt-8 pb-6">
+            <div className="flex-1 w-full flex flex-col px-6 max-w-6xl mx-auto overflow-y-auto pb-10 pt-16 md:pt-4">
+
+                {/* Top Header Row - Now horizontally tracking the button side-by-side again */}
+                <div className="w-full flex flex-row items-center justify-between pt-8 pb-6">
                     <div>
                         <h1 className="text-2xl md:text-3xl font-normal tracking-wide text-forest-dark">
                             Student Insights
@@ -144,12 +158,19 @@ export default function StudentInsightsDashboard() {
                             Anonymized data analytics for curriculum optimization
                         </p>
                     </div>
-                    <button
-                        onClick={() => router.push('/instructor')}
-                        className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-forest-dark/80 hover:text-forest-dark transition-colors border border-forest-dark/20 px-3 py-2 rounded-lg bg-pebble-light/30"
-                    >
-                        ← Back to Console
-                    </button>
+
+                    {/* --- DESKTOP ONLY SIDE-BY-SIDE INLINE BUTTON --- */}
+                    <div className="hidden md:block">
+                        <button
+                            onClick={() => router.push('/instructor')}
+                            className="text-xs font-bold bg-jade-accent text-white px-4 py-2.5 rounded-full shadow-md hover:bg-forest-dark border border-white/10 flex items-center space-x-1.5 transition active:scale-95 cursor-pointer whitespace-nowrap"
+                        >
+                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7 7-7m8 14l-7-7 7-7" />
+                            </svg>
+                            <span>Return to Instructor Console</span>
+                        </button>
+                    </div>
                 </div>
 
                 {/* --- METRICS CARDS ROW --- */}
@@ -179,20 +200,20 @@ export default function StudentInsightsDashboard() {
                 {/* --- LOWER DETAILS ROW --- */}
                 <div className="grid grid-cols-1 md:grid-cols-5 gap-6 items-start">
 
-                    {/* --- AI weekly summary container --- */}
+                    {/* --- AI WEEKLY SUMMARY CONTAINER --- */}
                     <div className="w-full md:col-span-5 bg-forest-dark text-pebble-light p-6 rounded-2xl mb-2 border border-forest-dark/20 shadow-md relative">
                         <div className="flex items-center gap-2 mb-4">
-                            <h2 className="text-sm font-bold uppercase tracking-wider opacity-90">Summary of Student Queries</h2>
                             <span className="bg-jade-accent text-forest-dark text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-sm">
                                 AI Insights
                             </span>
+                            <h2 className="text-sm font-bold uppercase tracking-wider opacity-90">Weekly Student Query Summaries</h2>
                         </div>
 
                         {isAiLoading ? (
                             <div className="py-6 flex items-center justify-center">
-                                <LoadingOtter
-                                    size="normal"
-                                    message="Ollie is summarizing student queries from the past week..."
+                                <LoadingOtter 
+                                    size="normal" 
+                                    message="Running semantic synthesis on recent prompt clusters..." 
                                     className="text-pebble-light"
                                 />
                             </div>
@@ -204,7 +225,7 @@ export default function StudentInsightsDashboard() {
                     </div>
 
                     {/* Left Side: Keywords Distribution */}
-                    <div className="md:col-span-2 bg-pebble-light/30 border border-sage-border/60 rounded-2xl p-6">
+                    <div className="md:col-span-2 w-full bg-pebble-light/30 border border-sage-border/60 rounded-2xl p-6">
                         <h3 className="text-sm font-bold uppercase tracking-wider text-forest-dark/80 mb-4 flex items-center gap-2">
                             <svg className="w-4 h-4 animate-swim" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M7 7h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -234,7 +255,7 @@ export default function StudentInsightsDashboard() {
                     </div>
 
                     {/* Right Side: Sample Prompts Stream */}
-                    <div className="md:col-span-3 bg-pebble-light/30 border border-sage-border/60 rounded-2xl p-6 flex flex-col max-h-[420px]">
+                    <div className="md:col-span-3 w-full bg-pebble-light/30 border border-sage-border/60 rounded-2xl p-6 flex flex-col max-h-[420px]">
                         <h3 className="text-sm font-bold uppercase tracking-wider text-forest-dark/80 mb-4">
                             Live Prompt Feed (Anonymized)
                         </h3>

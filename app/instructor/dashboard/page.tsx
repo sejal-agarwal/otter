@@ -26,7 +26,7 @@ export default function StudentInsightsDashboard() {
         commonKeywords: [],
         recentQueries: []
     })
-    
+
     const [aiSummary, setAiSummary] = useState<string>('')
     const [isAiLoading, setIsAiLoading] = useState<boolean>(true)
 
@@ -211,15 +211,28 @@ export default function StudentInsightsDashboard() {
 
                         {isAiLoading ? (
                             <div className="py-6 flex items-center justify-center">
-                                <LoadingOtter 
-                                    size="normal" 
-                                    message="Running semantic synthesis on recent prompt clusters..." 
+                                <LoadingOtter
+                                    size="normal"
+                                    message="Running semantic synthesis on recent prompt clusters..."
                                     className="text-pebble-light"
                                 />
                             </div>
                         ) : (
-                            <div className="text-xs md:text-sm leading-relaxed opacity-90 font-light whitespace-pre-line space-y-1">
-                                {aiSummary}
+                            <div className="text-xs md:text-sm leading-relaxed opacity-90 font-light space-y-3 px-1">
+                                {aiSummary
+                                    .split('\n')
+                                    .filter(line => line.trim().length > 0)
+                                    .map((line, idx) => {
+                                        // Clean off any lingering dashes or bullet points from the model response string
+                                        const cleanText = line.replace(/^\s*[•\-\*\s]+\s*/, '');
+                                        return (
+                                            /* pl-5 creates space for our custom bullet element; -ml-5 pulls only the bullet back to the margin */
+                                            <div key={idx} className="pl-5 relative break-words">
+                                                <span className="absolute left-0 text-jade-accent font-bold select-none">•</span>
+                                                {cleanText}
+                                            </div>
+                                        );
+                                    })}
                             </div>
                         )}
                     </div>

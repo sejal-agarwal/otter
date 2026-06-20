@@ -56,7 +56,7 @@ export async function GET() {
             messages: [
                 {
                     role: 'system',
-                    content: 'You are a helpful teaching assistant assistant. Summarize what these student prompts focus on in 2 to 3 concise sentences or short bullet points.'
+                    content: 'You are an expert academic data analyst. Analyze the following student questions. Provide a concise, professional summary containing exactly 3 distinct bullet points outlining the core concepts students are struggling with. CRITICAL: Use standard unicode bullet point symbols (•) to start each line instead of dashes or numbers.'
                 },
                 {
                     role: 'user',
@@ -65,7 +65,6 @@ export async function GET() {
             ],
             temperature: 0.3,
         })
-
         const aiSummary = completion.choices[0]?.message?.content || "Could not generate summary format."
 
         return NextResponse.json({ summary: aiSummary })

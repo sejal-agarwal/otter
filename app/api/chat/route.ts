@@ -23,7 +23,7 @@ export async function POST(req: Request) {
     let citationReferences: Array<{ name: string; url: string }> = []
 
     try {
-      // Step A: Convert the clean user prompt text string into vector coordinates
+      // Step A: Convert user prompt into vector coordinates
       const embeddingResponse = await openai.embeddings.create({
         model: 'text-embedding-3-small',
         input: titleSourceText,
@@ -35,8 +35,8 @@ export async function POST(req: Request) {
         'match_course_chunks',
         {
           query_embedding: queryVector,
-          match_threshold: 0.35, // Adjust similarity tolerances
-          match_count: 5 // Feed top 5 chunks
+          match_threshold: 0.35, 
+          match_count: 5 
         }
       )
 
@@ -53,15 +53,20 @@ export async function POST(req: Request) {
             .single()
 
           if (material) {
-            contextString += `\n[Source File: ${material.name} | Page: ${chunk.page_number}]\nContent: ${chunk.content}\n`
+            // 1. Resolve base public bucket URL
+            const { data: urlData } = supabaseAdmin.storage
+              .from('course-knowledge-base')
+              .getPublicUrl(material.storage_path)
+
+            const fileUrl = urlData.publicUrl
+            const specificPageUrl = `${fileUrl}#page=${chunk.page_number}`
+
+            // 2. Feed the absolute page hyperlink directly inside the context block for the LLM to read
+            contextString += `\n[Source File: ${material.name} | Page: ${chunk.page_number} | Direct Link: ${specificPageUrl}]\nContent: ${chunk.content}\n`
 
             if (!fileCitationsMap[material.name]) {
-              const { data: urlData } = supabaseAdmin.storage
-                .from('course-knowledge-base')
-                .getPublicUrl(material.storage_path)
-
               fileCitationsMap[material.name] = {
-                url: urlData.publicUrl,
+                url: fileUrl,
                 pages: new Set<number>()
               }
             }
@@ -79,7 +84,6 @@ export async function POST(req: Request) {
       }
     } catch (ragError) {
       console.error('RAG contextual matching pipeline anomaly:', ragError)
-      // Non-blocking fallback: let the conversation loop proceed without crashing if embeddings fail
     }
 
     const formattedHistory = messages.map((m: any) => ({
@@ -92,20 +96,23 @@ export async function POST(req: Request) {
       userContent.push({ type: 'image_url', image_url: { url: base64Image } })
     }
 
-const systemPrompt = {
-  role: 'system',
-  content: `You are Ollie the Otter, a helpful classroom teaching assistant.
-  
-  Answer the student's question accurately using ONLY the provided course reference context blocks underneath.
-  
-  STRICT INLINE LINK RULE: When you reference a fact from a file, you MUST immediately insert an inline link using this exact template format: [View: FileName.pdf | Page: X] (e.g., "...as discussed in the design introduction [View: Lecture_01_Introduction.pdf | Page: 3]"). Do not use standard markdown links or alternate phrasing.
-  
-  If the provided course documents do not contain the answer, politely tell the student that the information isn't in the uploaded materials yet.
-  
-  ---
-  COURSE CONTEXT LOGS:
-  ${contextString || "No master data embedded for this query topic yet."}`
-}
+    const systemPrompt = {
+      role: 'system',
+      content: `You are Ollie the Otter, a helpful classroom teaching assistant.
+      
+      Answer the student's question accurately using ONLY the provided course reference context blocks underneath.
+      
+      STRICT INLINE LINK RULE: When you reference a fact or quote from a file context block, you MUST place it immediately AFTER the sentence's closing period. 
+      Format it exactly like this standard markdown link template: [View: FileName.pdf, Page X](Direct Link)
+      
+      Example: "...as discussed in the core introduction. [View: Lecture_01_Introduction.pdf, Page 5](https://your-project.supabase.co/storage/v1/object/public/course-knowledge-base/Lecture_01_Introduction.pdf#page=5)"
+      
+      Notice that the link comes *after* the period. Do not alter this placement or omit the URL.
+      
+      ---
+      COURSE CONTEXT LOGS:
+      ${contextString || "No master data embedded for this query topic yet."}`
+    }
 
     const apiMessages = [
       systemPrompt,
@@ -116,7 +123,7 @@ const systemPrompt = {
     const completion = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
       messages: apiMessages,
-      temperature: 0.2 // Lower temp locks down hallucinations and sticks directly to provided materials
+      temperature: 0.2 
     })
     const aiResponse = completion.choices[0]?.message?.content || "I couldn't process that response."
 

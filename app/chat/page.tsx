@@ -308,14 +308,14 @@ export default function StudentChatPage() {
                     session_id: currentSessionId,
                     role: 'assistant',
                     content: data.content,
-                    citations: data.citations 
+                    citations: data.citations
                 })
 
                 setMessages((prev) => [...prev, {
                     id: crypto.randomUUID(),
                     role: 'assistant',
                     content: data.content,
-                    citations: data.citations 
+                    citations: data.citations
                 }])
 
                 if (data.title) {
@@ -535,11 +535,22 @@ export default function StudentChatPage() {
                                                 </div>
                                             )}
 
-                                            {/* Unified, native ReactMarkdown component */}
-                                            <div className={`prose prose-sm max-w-none break-words leading-relaxed ${
-                                                msg.role === 'user' ? 'text-white prose-headings:text-white prose-strong:text-white' : 'text-forest-dark/90'
-                                            }`}>
-                                                <ReactMarkdown>{msg.content}</ReactMarkdown>
+                                            <div className={`prose prose-sm max-w-none break-words leading-relaxed ${msg.role === 'user' ? 'text-white prose-headings:text-white prose-strong:text-white' : 'text-forest-dark/90'
+                                                }`}>
+                                                <ReactMarkdown
+                                                    components={{
+                                                        a: ({ node, ...props }) => (
+                                                            <a
+                                                                {...props}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className="font-bold no-underline hover:underline underline-offset-4 decoration-2 transition duration-150 text-jade-accent hover:text-jade-accent text-sm"
+                                                            />
+                                                        )
+                                                    }}
+                                                >
+                                                    {msg.content}
+                                                </ReactMarkdown>
                                             </div>
                                         </div>
                                     </div>

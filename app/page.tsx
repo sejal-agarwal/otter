@@ -21,7 +21,7 @@ export default function HomePage() {
       if (displayText.length < currentFullText.length) {
         timer = setTimeout(() => {
           setDisplayText(currentFullText.substring(0, displayText.length + 1))
-        }, 80)
+        }, 100)
       } else {
         timer = setTimeout(() => setIsDeleting(true), 2000)
       }
@@ -29,7 +29,7 @@ export default function HomePage() {
       if (displayText.length > 0) {
         timer = setTimeout(() => {
           setDisplayText(currentFullText.substring(0, displayText.length - 1))
-        }, 40)
+        }, 60)
       } else {
         setIsDeleting(false)
         setPhraseIdx((prev) => (prev + 1) % phrases.length)

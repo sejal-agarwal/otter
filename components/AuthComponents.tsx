@@ -13,13 +13,15 @@ export function AuthCard({ subtitle, footerText, footerLinkText, footerHref, chi
   return (
     <div className="flex min-h-screen items-center justify-center bg-sage-border px-4 select-none font-abeezee">
       <div className="w-full max-w-md space-y-6 rounded-[2.5rem] bg-jade-accent p-10 shadow-2xl border border-jade-accent text-white text-center">
-        
         {/* Branding Header */}
         <div className="flex flex-col items-center space-y-2">
-          <div className="relative h-20 w-20 transition-transform duration-300 hover:scale-105">
-            <Image src="/otter.png" alt="Otter Logo" fill className="object-contain" priority />
-          </div>
-          <h1 className="text-4xl font-normal tracking-wide text-white">Otter</h1>
+          <Link href="/" className="flex flex-col items-center space-y-2 cursor-pointer text-inherit hover:text-inherit no-underline">
+            <div className="relative h-20 w-20 transition-transform duration-300 hover:scale-105">
+              <Image src="/otter.png" alt="Otter Logo" fill className="object-contain" priority />
+            </div>
+            <h1 className="text-4xl font-normal tracking-wide text-white">Otter</h1>
+          </Link>
+
           <p className="text-base text-pebble-light font-medium opacity-90">{subtitle}</p>
         </div>
 

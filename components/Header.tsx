@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import Link from 'next/link'
 import { createClient } from '@/utils/supabase/client'
 
 export function Header() {
@@ -21,10 +22,14 @@ export function Header() {
   return (
     <header className="w-full bg-jade-accent text-white shadow-md flex-shrink-0 z-30 border-b border-jade-accent">
       <div className="max-w-7xl mx-auto px-6 md:px-10 h-20 flex justify-between items-center">
-        <div className="flex items-center space-x-3 select-none">
+        
+        <Link 
+          href="/" 
+          className="flex items-center space-x-3 select-none cursor-pointer text-inherit hover:text-inherit no-underline"
+        >
           <Image src="/otter.png" alt="Otter Logo" width={34} height={34} className="object-contain" priority />
           <span className="text-2xl font-normal tracking-wide text-white">Otter</span>
-        </div>
+        </Link>
         
         <button 
           onClick={handleLogout}

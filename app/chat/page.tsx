@@ -7,6 +7,7 @@ import { createClient } from '@/utils/supabase/client'
 import { Button, ReturnToInstructorConsoleButton } from '@/components/Buttons'
 import ReactMarkdown from 'react-markdown'
 import { LoadingOtter } from '@/components/LoadingOtter'
+import Link from 'next/link'
 
 interface CitationFile {
     name: string
@@ -383,10 +384,14 @@ export default function StudentChatPage() {
                 <div className={`p-6 flex flex-col h-full overflow-hidden transition-opacity duration-200 ${isSidebarOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
 
                     <div className="flex items-center justify-between mb-6 flex-shrink-0">
-                        <div className="flex items-center space-x-3">
+
+                        <Link
+                            href="/"
+                            className="flex items-center space-x-3 select-none cursor-pointer text-inherit hover:text-inherit no-underline"
+                        >
                             <Image src="/otter.png" alt="Letter O" width={36} height={36} className="object-contain" />
                             <span className="text-2xl font-normal tracking-wide">Otter</span>
-                        </div>
+                        </Link>
 
                         <button
                             onClick={() => setIsSidebarOpen(false)}

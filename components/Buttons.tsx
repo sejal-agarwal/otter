@@ -13,7 +13,7 @@ export function Button({
   isPending = false,
   disabled,
   className = '',
-  type = 'button',
+  type = 'submit',
   ...props
 }: ButtonProps) {
   return (

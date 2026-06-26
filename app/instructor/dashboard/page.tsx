@@ -130,172 +130,170 @@ export default function StudentInsightsDashboard() {
     }
 
     return (
-        <div className="h-screen w-screen bg-sage-border font-abeezee text-forest-dark flex flex-col overflow-hidden relative">
-            <Header />
+    <div className="h-screen w-screen bg-sage-border font-abeezee text-forest-dark flex flex-col overflow-y-auto relative">
+        <Header />
 
-            {/* --- MOBILE ONLY FIXED TOP LAYER --- */}
-            <div className="md:hidden fixed top-16 left-0 right-0 z-30 flex justify-center bg-sage-border/90 backdrop-blur-md py-3 px-4 border-b border-forest-dark/10 shadow-xs">
-                <button
-                    onClick={() => router.push('/instructor')}
-                    className="w-full text-center text-xs font-bold bg-jade-accent text-white px-4 py-2.5 rounded-full shadow-sm hover:bg-forest-dark border border-white/10 flex items-center justify-center space-x-1.5 transition active:scale-95 cursor-pointer"
-                >
-                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7 7-7m8 14l-7-7 7-7" />
-                    </svg>
-                    <span>Return to Instructor Console</span>
-                </button>
+        {/* --- MOBILE ONLY FIXED TOP LAYER --- */}
+        <div className="md:hidden fixed top-16 left-0 right-0 z-30 flex justify-center bg-sage-border/90 backdrop-blur-md py-3 px-4 border-b border-forest-dark/10 shadow-xs">
+            <button
+                onClick={() => router.push('/instructor')}
+                className="w-full text-center text-xs font-bold bg-jade-accent text-white px-4 py-2.5 rounded-full shadow-sm hover:bg-forest-dark border border-white/10 flex items-center justify-center space-x-1.5 transition active:scale-95 cursor-pointer"
+            >
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7 7-7m8 14l-7-7 7-7" />
+                </svg>
+                <span>Return to Instructor Console</span>
+            </button>
+        </div>
+
+        <div className="w-full flex flex-col px-6 max-w-6xl mx-auto pb-10 pt-16 md:pt-4">
+
+            {/* Top Header Row */}
+            <div className="w-full flex flex-row items-center justify-between pt-8 pb-6">
+                <div>
+                    <h1 className="text-2xl md:text-3xl font-normal tracking-wide text-forest-dark">
+                        Student Insights
+                    </h1>
+                    <p className="text-xs text-forest-dark/60 font-medium mt-1">
+                        Anonymized data analytics for curriculum optimization
+                    </p>
+                </div>
+
+                {/* --- DESKTOP ONLY SIDE-BY-SIDE INLINE BUTTON --- */}
+                <div className="hidden md:block">
+                    <button
+                        onClick={() => router.push('/instructor')}
+                        className="text-xs font-bold bg-jade-accent text-white px-4 py-2.5 rounded-full shadow-md hover:bg-forest-dark border border-white/10 flex items-center space-x-1.5 transition active:scale-95 cursor-pointer whitespace-nowrap"
+                    >
+                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7 7-7m8 14l-7-7 7-7" />
+                        </svg>
+                        <span>Return to Instructor Console</span>
+                    </button>
+                </div>
             </div>
 
-            <div className="flex-1 w-full flex flex-col px-6 max-w-6xl mx-auto overflow-y-auto pb-10 pt-16 md:pt-4">
-
-                {/* Top Header Row - Now horizontally tracking the button side-by-side again */}
-                <div className="w-full flex flex-row items-center justify-between pt-8 pb-6">
-                    <div>
-                        <h1 className="text-2xl md:text-3xl font-normal tracking-wide text-forest-dark">
-                            Student Insights
-                        </h1>
-                        <p className="text-xs text-forest-dark/60 font-medium mt-1">
-                            Anonymized data analytics for curriculum optimization
-                        </p>
-                    </div>
-
-                    {/* --- DESKTOP ONLY SIDE-BY-SIDE INLINE BUTTON --- */}
-                    <div className="hidden md:block">
-                        <button
-                            onClick={() => router.push('/instructor')}
-                            className="text-xs font-bold bg-jade-accent text-white px-4 py-2.5 rounded-full shadow-md hover:bg-forest-dark border border-white/10 flex items-center space-x-1.5 transition active:scale-95 cursor-pointer whitespace-nowrap"
-                        >
-                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7 7-7m8 14l-7-7 7-7" />
-                            </svg>
-                            <span>Return to Instructor Console</span>
-                        </button>
-                    </div>
+            {/* --- METRICS CARDS ROW --- */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div className="bg-pebble-light/40 border border-sage-border backdrop-blur-xs p-6 rounded-2xl flex flex-col justify-between shadow-xs relative overflow-hidden group">
+                    <span className="text-xs font-bold tracking-wider uppercase text-forest-dark/60">Total Student Queries</span>
+                    <span className="text-4xl font-normal text-forest-dark mt-4 group-hover:scale-105 transition-transform origin-left block">
+                        {metrics.totalQueries}
+                    </span>
                 </div>
 
-                {/* --- METRICS CARDS ROW --- */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <div className="bg-pebble-light/40 border border-sage-border backdrop-blur-xs p-6 rounded-2xl flex flex-col justify-between shadow-xs relative overflow-hidden group">
-                        <span className="text-xs font-bold tracking-wider uppercase text-forest-dark/60">Total Student Queries</span>
-                        <span className="text-4xl font-normal text-forest-dark mt-4 group-hover:scale-105 transition-transform origin-left block">
-                            {metrics.totalQueries}
-                        </span>
-                    </div>
-
-                    <div className="bg-pebble-light/40 border border-sage-border backdrop-blur-xs p-6 rounded-2xl flex flex-col justify-between shadow-xs relative overflow-hidden group">
-                        <span className="text-xs font-bold tracking-wider uppercase text-forest-dark/60">Active Student Users</span>
-                        <span className="text-4xl font-normal text-forest-dark mt-4 group-hover:scale-105 transition-transform origin-left block">
-                            {metrics.activeStudents}
-                        </span>
-                    </div>
-
-                    <div className="bg-pebble-light/40 border border-sage-border backdrop-blur-xs p-6 rounded-2xl flex flex-col justify-between shadow-xs relative overflow-hidden group">
-                        <span className="text-xs font-bold tracking-wider uppercase text-forest-dark/60">Avg. Queries / Student</span>
-                        <span className="text-4xl font-normal text-forest-dark mt-4 group-hover:scale-105 transition-transform origin-left block">
-                            {metrics.avgQueriesPerStudent}
-                        </span>
-                    </div>
+                <div className="bg-pebble-light/40 border border-sage-border backdrop-blur-xs p-6 rounded-2xl flex flex-col justify-between shadow-xs relative overflow-hidden group">
+                    <span className="text-xs font-bold tracking-wider uppercase text-forest-dark/60">Active Student Users</span>
+                    <span className="text-4xl font-normal text-forest-dark mt-4 group-hover:scale-105 transition-transform origin-left block">
+                        {metrics.activeStudents}
+                    </span>
                 </div>
 
-                {/* --- LOWER DETAILS ROW --- */}
-                <div className="grid grid-cols-1 md:grid-cols-5 gap-6 items-start">
+                <div className="bg-pebble-light/40 border border-sage-border backdrop-blur-xs p-6 rounded-2xl flex flex-col justify-between shadow-xs relative overflow-hidden group">
+                    <span className="text-xs font-bold tracking-wider uppercase text-forest-dark/60">Avg. Queries / Student</span>
+                    <span className="text-4xl font-normal text-forest-dark mt-4 group-hover:scale-105 transition-transform origin-left block">
+                        {metrics.avgQueriesPerStudent}
+                    </span>
+                </div>
+            </div>
 
-                    {/* --- AI WEEKLY SUMMARY CONTAINER --- */}
-                    <div className="w-full md:col-span-5 bg-forest-dark text-pebble-light p-6 rounded-2xl mb-2 border border-forest-dark/20 shadow-md relative">
-                        <div className="flex items-center gap-2 mb-4">
-                            <span className="bg-jade-accent text-forest-dark text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-sm">
-                                AI Insights
-                            </span>
-                            <h2 className="text-sm font-bold uppercase tracking-wider opacity-90">Weekly Student Query Summaries</h2>
+            {/* --- LOWER DETAILS ROW --- */}
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-6 items-start">
+
+                {/* --- AI WEEKLY SUMMARY CONTAINER --- */}
+                <div className="w-full md:col-span-5 bg-forest-dark text-pebble-light p-6 rounded-2xl mb-2 border border-forest-dark/20 shadow-md relative">
+                    <div className="flex items-center gap-2 mb-4">
+                        <span className="bg-jade-accent text-forest-dark text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-sm">
+                            AI Insights
+                        </span>
+                        <h2 className="text-sm font-bold uppercase tracking-wider opacity-90">Weekly Student Query Summaries</h2>
+                    </div>
+
+                    {isAiLoading ? (
+                        <div className="py-6 flex items-center justify-center">
+                            <LoadingOtter
+                                size="normal"
+                                message="Running semantic synthesis on recent prompt clusters..."
+                                className="text-pebble-light"
+                            />
                         </div>
+                    ) : (
+                        <div className="text-xs md:text-sm leading-relaxed opacity-90 font-light space-y-3 px-1">
+                            {aiSummary
+                                .split('\n')
+                                .filter(line => line.trim().length > 0)
+                                .map((line, idx) => {
+                                    const cleanText = line.replace(/^\s*[•\-\*\s]+\s*/, '');
+                                    return (
+                                        <div key={idx} className="pl-5 relative break-words">
+                                            <span className="absolute left-0 text-jade-accent font-bold select-none">•</span>
+                                            {cleanText}
+                                        </div>
+                                    );
+                                })}
+                        </div>
+                    )}
+                </div>
 
-                        {isAiLoading ? (
-                            <div className="py-6 flex items-center justify-center">
-                                <LoadingOtter
-                                    size="normal"
-                                    message="Running semantic synthesis on recent prompt clusters..."
-                                    className="text-pebble-light"
-                                />
-                            </div>
+                {/* Left Side: Keywords Distribution */}
+                <div className="md:col-span-2 w-full bg-pebble-light/30 border border-sage-border/60 rounded-2xl p-6">
+                    <h3 className="text-sm font-bold uppercase tracking-wider text-forest-dark/80 mb-4 flex items-center gap-2">
+                        <svg className="w-4 h-4 animate-swim" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M7 7h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        Common Query Keywords
+                    </h3>
+                    <div className="space-y-3">
+                        {metrics.commonKeywords.length === 0 ? (
+                            <p className="text-xs text-forest-dark/50 italic">Insufficient interaction data to cluster topics.</p>
                         ) : (
-                            <div className="text-xs md:text-sm leading-relaxed opacity-90 font-light space-y-3 px-1">
-                                {aiSummary
-                                    .split('\n')
-                                    .filter(line => line.trim().length > 0)
-                                    .map((line, idx) => {
-                                        // Clean off any lingering dashes or bullet points from the model response string
-                                        const cleanText = line.replace(/^\s*[•\-\*\s]+\s*/, '');
-                                        return (
-                                            /* pl-5 creates space for our custom bullet element; -ml-5 pulls only the bullet back to the margin */
-                                            <div key={idx} className="pl-5 relative break-words">
-                                                <span className="absolute left-0 text-jade-accent font-bold select-none">•</span>
-                                                {cleanText}
-                                            </div>
-                                        );
-                                    })}
-                            </div>
+                            metrics.commonKeywords.map((item, idx) => (
+                                <div key={idx} className="flex flex-col">
+                                    <div className="flex justify-between text-xs font-medium mb-1 px-1">
+                                        <span className="text-forest-dark font-mono">#{item.word}</span>
+                                        <span className="text-forest-dark/60">{item.count} hits</span>
+                                    </div>
+                                    <div className="w-full bg-forest-dark/10 h-2 rounded-full overflow-hidden">
+                                        <div
+                                            className="bg-jade-accent h-full rounded-full transition-all duration-500"
+                                            style={{ width: `${(item.count / metrics.totalQueries) * 100}%` }}
+                                        />
+                                    </div>
+                                </div>
+                            ))
                         )}
                     </div>
+                </div>
 
-                    {/* Left Side: Keywords Distribution */}
-                    <div className="md:col-span-2 w-full bg-pebble-light/30 border border-sage-border/60 rounded-2xl p-6">
-                        <h3 className="text-sm font-bold uppercase tracking-wider text-forest-dark/80 mb-4 flex items-center gap-2">
-                            <svg className="w-4 h-4 animate-swim" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M7 7h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                            Common Query Keywords
-                        </h3>
-                        <div className="space-y-3">
-                            {metrics.commonKeywords.length === 0 ? (
-                                <p className="text-xs text-forest-dark/50 italic">Insufficient interaction data to cluster topics.</p>
-                            ) : (
-                                metrics.commonKeywords.map((item, idx) => (
-                                    <div key={idx} className="flex flex-col">
-                                        <div className="flex justify-between text-xs font-medium mb-1 px-1">
-                                            <span className="text-forest-dark font-mono">#{item.word}</span>
-                                            <span className="text-forest-dark/60">{item.count} hits</span>
-                                        </div>
-                                        <div className="w-full bg-forest-dark/10 h-2 rounded-full overflow-hidden">
-                                            <div
-                                                className="bg-jade-accent h-full rounded-full transition-all duration-500"
-                                                style={{ width: `${(item.count / metrics.totalQueries) * 100}%` }}
-                                            />
-                                        </div>
-                                    </div>
-                                ))
-                            )}
-                        </div>
+                {/* Right Side: Sample Prompts Stream */}
+                <div className="md:col-span-3 w-full bg-pebble-light/30 border border-sage-border/60 rounded-2xl p-6 flex flex-col max-h-[420px]">
+                    <h3 className="text-sm font-bold uppercase tracking-wider text-forest-dark/80 mb-4">
+                        Live Prompt Feed (Anonymized)
+                    </h3>
+                    <div className="flex-1 space-y-3 overflow-y-auto pr-1">
+                        {metrics.recentQueries.length === 0 ? (
+                            <p className="text-xs text-forest-dark/50 italic py-4 text-center">No student queries have been generated yet.</p>
+                        ) : (
+                            metrics.recentQueries.map((query) => (
+                                <div
+                                    key={query.id}
+                                    className="p-3 bg-pebble-light/60 border border-sage-border rounded-xl flex flex-col justify-between gap-2 hover:bg-pebble-light transition-colors"
+                                >
+                                    <p className="text-xs text-forest-dark font-normal leading-relaxed break-words">
+                                        &ldquo;{query.content}&rdquo;
+                                    </p>
+                                    <span className="text-[10px] text-slate-mist font-semibold self-end">
+                                        {new Date(query.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                    </span>
+                                </div>
+                            ))
+                        )}
                     </div>
-
-                    {/* Right Side: Sample Prompts Stream */}
-                    <div className="md:col-span-3 w-full bg-pebble-light/30 border border-sage-border/60 rounded-2xl p-6 flex flex-col max-h-[420px]">
-                        <h3 className="text-sm font-bold uppercase tracking-wider text-forest-dark/80 mb-4">
-                            Live Prompt Feed (Anonymized)
-                        </h3>
-                        <div className="flex-1 space-y-3 overflow-y-auto pr-1">
-                            {metrics.recentQueries.length === 0 ? (
-                                <p className="text-xs text-forest-dark/50 italic py-4 text-center">No student queries have been generated yet.</p>
-                            ) : (
-                                metrics.recentQueries.map((query) => (
-                                    <div
-                                        key={query.id}
-                                        className="p-3 bg-pebble-light/60 border border-sage-border rounded-xl flex flex-col justify-between gap-2 hover:bg-pebble-light transition-colors"
-                                    >
-                                        <p className="text-xs text-forest-dark font-normal leading-relaxed break-words">
-                                            &ldquo;{query.content}&rdquo;
-                                        </p>
-                                        <span className="text-[10px] text-slate-mist font-semibold self-end">
-                                            {new Date(query.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                        </span>
-                                    </div>
-                                ))
-                            )}
-                        </div>
-                    </div>
-
                 </div>
 
             </div>
+
         </div>
-    )
+    </div>
+)
 }

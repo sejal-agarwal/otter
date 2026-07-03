@@ -70,29 +70,28 @@ export default function StudentChatPage() {
                 }
                 setUserId(user.id)
 
-                // Fetch name
+                const { data: profile } = await supabase
+                    .from('profiles')
+                    .select('name, role, group_id')
+                    .eq('id', user.id)
+                    .single()
+
+                console.log("Chat guard checked profile:", profile)
+
+                const userRole = profile?.role || 'STUDENT'
+
                 if (user.user_metadata?.name) {
                     setUserName(user.user_metadata.name)
-
-                    const { data: profile } = await supabase
-                        .from('profiles')
-                        .select('role')
-                        .eq('id', user.id)
-                        .single()
-
-                    if (profile?.role === 'INSTRUCTOR') {
-                        setIsInstructor(true)
-                    }
                 } else {
-                    const { data: profile } = await supabase
-                        .from('profiles')
-                        .select('name, role')
-                        .eq('id', user.id)
-                        .single()
                     setUserName(profile?.name || 'User Account')
+                }
 
-                    if (profile?.role === 'INSTRUCTOR') {
-                        setIsInstructor(true)
+                if (userRole === 'INSTRUCTOR') {
+                    setIsInstructor(true)
+                } else {
+                    if (!profile?.group_id) {
+                        router.push('/groups')
+                        return // Halt further setup execution
                     }
                 }
 

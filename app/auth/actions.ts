@@ -10,7 +10,7 @@ const supabaseAdmin = createSupabaseAdmin(
 
 export async function login(state: any, formData: FormData) {
   const supabase = await createClient()
-  
+
   const email = formData.get('email') as string
   const password = formData.get('password') as string
 
@@ -18,7 +18,6 @@ export async function login(state: any, formData: FormData) {
     return { error: 'Please fill in all fields.' }
   }
 
-  // 1. Verify the password credentials against Supabase Auth
   const { data, error } = await supabase.auth.signInWithPassword({
     email: email.trim().toLowerCase(),
     password,
@@ -28,10 +27,9 @@ export async function login(state: any, formData: FormData) {
     return { error: error.message }
   }
 
-  // 2. Use admin client to bypass cookie race condition and look up the role securely
   const { data: profile, error: profileError } = await supabaseAdmin
     .from('profiles')
-    .select('role')
+    .select('role, group_id')
     .eq('id', data.user.id)
     .single()
 
@@ -39,12 +37,19 @@ export async function login(state: any, formData: FormData) {
     return { error: 'Failed to fetch user profile.' }
   }
 
-  // 3. Handle case-insensitive fallback configurations smoothly
   const userRole = profile.role.toUpperCase()
 
-  return { 
-    success: true, 
-    redirectTo: userRole === 'INSTRUCTOR' ? '/instructor' : '/chat' 
+  let redirectTo = '/chat'
+
+  if (userRole === 'INSTRUCTOR') {
+    redirectTo = '/instructor'
+  } else if (!profile.group_id) {
+    redirectTo = '/groups'
+  }
+
+  return {
+    success: true,
+    redirectTo
   }
 }
 
@@ -73,5 +78,5 @@ export async function signup(state: any, formData: FormData) {
     return { error: error.message }
   }
 
-  return { success: true, redirectTo: '/chat' }
+  return { success: true, redirectTo: '/groups' }
 }

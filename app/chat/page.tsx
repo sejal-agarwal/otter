@@ -8,6 +8,7 @@ import { Button, ReturnToInstructorConsoleButton } from '@/components/Buttons'
 import ReactMarkdown from 'react-markdown'
 import { LoadingOtter } from '@/components/LoadingOtter'
 import Link from 'next/link'
+import { ProfileSettingsModal } from '@/components/ProfileSettingsModal'
 
 interface CitationFile {
     name: string
@@ -51,6 +52,11 @@ export default function StudentChatPage() {
     const [attachedFileType, setAttachedFileType] = useState<string | null>(null)
     const [attachedFileText, setAttachedFileText] = useState<string | null>(null)
 
+    const [isProfileModalOpen, setIsProfileModalOpen] = useState(false)
+    const [modalNameInput, setModalNameInput] = useState('')
+    const [currentGroupName, setCurrentGroupName] = useState<string | null>(null)
+    const [isModalSaving, setIsModalSaving] = useState(false)
+
     const fileInputRef = useRef<HTMLInputElement>(null)
     const scrollRef = useRef<HTMLDivElement>(null)
 
@@ -80,18 +86,32 @@ export default function StudentChatPage() {
 
                 const userRole = profile?.role || 'STUDENT'
 
-                if (user.user_metadata?.name) {
-                    setUserName(user.user_metadata.name)
-                } else {
-                    setUserName(profile?.name || 'User Account')
+                let activeName = 'User Account'
+                if (profile?.name) {
+                    activeName = profile.name
+                } else if (user.user_metadata?.name) {
+                    activeName = user.user_metadata.name
                 }
+
+                setUserName(activeName)
+                setModalNameInput(activeName)
 
                 if (userRole === 'INSTRUCTOR') {
                     setIsInstructor(true)
                 } else {
                     if (!profile?.group_id) {
                         router.push('/groups')
-                        return // Halt further setup execution
+                        return
+                    }
+
+                    const { data: groupViewRow } = await supabase
+                        .from('group_member_counts')
+                        .select('group_name')
+                        .eq('group_id', profile.group_id)
+                        .single()
+
+                    if (groupViewRow?.group_name) {
+                        setCurrentGroupName(groupViewRow.group_name)
                     }
                 }
 
@@ -155,7 +175,48 @@ export default function StudentChatPage() {
         loadMessages()
     }, [activeSessionId, supabase])
 
-    // Helper to build a completely new chat session record
+    const handleUpdateProfileSettings = async (e: React.FormEvent) => {
+        e.preventDefault()
+        const cleanName = modalNameInput.trim()
+        if (!cleanName || !userId) return
+
+        setIsModalSaving(true)
+        try {
+            const { error } = await supabase
+                .from('profiles')
+                .update({ name: cleanName })
+                .eq('id', userId)
+
+            if (error) throw error
+
+            setUserName(cleanName)
+
+        } catch (err) {
+            console.error("Failed to re-sync student profile identity:", err)
+        } finally {
+            setIsModalSaving(false)
+        }
+    }
+
+    const handleLeaveGroupFromModal = async () => {
+        if (!userId) return
+        setIsModalSaving(true)
+        try {
+            const { error } = await supabase
+                .from('profiles')
+                .update({ group_id: null })
+                .eq('id', userId)
+
+            if (error) throw error
+
+            setIsProfileModalOpen(false)
+            router.push('/groups')
+        } catch (err) {
+            console.error("Failed to detach profile group from modal context:", err)
+            setIsModalSaving(false)
+        }
+    }
+
     const handleCreateNewSession = async () => {
         if (!userId) return
         const { data, error } = await supabase
@@ -196,7 +257,7 @@ export default function StudentChatPage() {
                 }
             }
         } catch (err) {
-            console.error('Failed to eliminate session row tracking metrics:', err)
+            console.error('Failed to eliminate session tracking metrics:', err)
         }
     }
 
@@ -224,7 +285,6 @@ export default function StudentChatPage() {
         }
     }
 
-    // Main submission flow to Supabase + API Route
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         const cleanTextPrompt = input.trim()
@@ -366,7 +426,7 @@ export default function StudentChatPage() {
     return (
         <div className="flex h-screen w-screen bg-sage-border overflow-hidden font-abeezee text-forest-dark relative">
 
-            {/* Mobile Panel */}
+            {/* Mobile Panel Overlay */}
             {isSidebarOpen && (
                 <div
                     onClick={() => setIsSidebarOpen(false)}
@@ -453,12 +513,24 @@ export default function StudentChatPage() {
                 {/* User profile info footer */}
                 <div className={`p-5 bg-forest-dark/10 border-t border-white/5 flex-shrink-0 transition-opacity duration-200 ${isSidebarOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
                     <div className="flex items-center justify-between w-full">
-                        <div className="flex items-center space-x-3 truncate max-w-[70%]">
-                            <div className="w-8 h-8 rounded-full bg-pebble-light text-forest-dark font-bold text-xs flex items-center justify-center uppercase flex-shrink-0">
+                        <div
+                            onClick={() => {
+                                if (!isInstructor) {
+                                    setModalNameInput(userName)
+                                    setIsProfileModalOpen(true)
+                                }
+                            }}
+                            className={`flex items-center space-x-3 truncate max-w-[70%] select-none ${!isInstructor ? 'cursor-pointer hover:opacity-85 transition group' : ''}`}
+                            title={!isInstructor ? "Manage Profile Settings" : undefined}
+                        >
+                            <div className="w-8 h-8 rounded-full bg-pebble-light text-forest-dark font-bold text-xs flex items-center justify-center uppercase flex-shrink-0 group-hover:scale-105 transition duration-150">
                                 {userName.substring(0, 2)}
                             </div>
-                            <span className="text-sm font-bold truncate text-white">{userName}</span>
+                            <span className={`text-sm font-bold truncate text-white ${!isInstructor ? 'underline decoration-dotted underline-offset-4 decoration-white/30 group-hover:decoration-white/70' : ''}`}>
+                                {userName}
+                            </span>
                         </div>
+
                         <div className="text-sm text-pebble-light opacity-90 flex-shrink-0">
                             <button
                                 onClick={async () => {
@@ -513,14 +585,12 @@ export default function StudentChatPage() {
                                             </span>
                                         </div>
 
-                                        {/* Message bubble block */}
                                         <div
                                             className={`max-w-[85%] rounded-[1.5rem] px-5 py-3.5 text-sm leading-relaxed tracking-wide shadow-sm transition-colors flex flex-col space-y-2 ${msg.role === 'user'
                                                 ? 'bg-forest-dark text-white rounded-tr-sm'
                                                 : 'bg-white text-forest-dark rounded-tl-sm border border-forest-dark/5'
                                                 }`}
                                         >
-                                            {/* User Upload Tray */}
                                             {msg.citations && msg.citations.length > 0 && msg.role === 'user' && (
                                                 <div className="flex flex-wrap gap-1.5 pb-1">
                                                     {msg.citations.map((file, fIdx) => (
@@ -658,7 +728,17 @@ export default function StudentChatPage() {
                     </p>
                 </div>
             </main>
-
+            <ProfileSettingsModal
+                isOpen={isProfileModalOpen}
+                onClose={() => setIsProfileModalOpen(false)}
+                userName={userName}
+                modalNameInput={modalNameInput}
+                setModalNameInput={setModalNameInput}
+                currentGroupName={currentGroupName}
+                isModalSaving={isModalSaving}
+                onUpdateProfileSettings={handleUpdateProfileSettings}
+                onLeaveGroupFromModal={handleLeaveGroupFromModal}
+            />
         </div>
     )
 }

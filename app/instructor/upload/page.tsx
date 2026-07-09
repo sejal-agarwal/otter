@@ -99,7 +99,7 @@ export default function MaterialsUploadPage() {
 
         try {
             for (const file of validFiles) {
-                const customStorageFileName = `${currentUserId}/${crypto.randomUUID()}-${file.name}`
+                const customStorageFileName = file.name
 
                 // Upload to Supabase Storage
                 const { error: storageErr } = await supabase.storage

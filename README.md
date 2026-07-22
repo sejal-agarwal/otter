@@ -1,17 +1,17 @@
-# 🦦 Otter
+# Otter
 
 Otter is a **Retrieval-Augmented Generation (RAG)** workspace that unifies course materials like slide decks, syllabi, and reading materials into an interactive student AI chat interface - or as we like to call it, Ollie the Otter. While students get precise, source-backed answers tailored to their exact classroom scope, instructors gain access to an aggregated, fully anonymized metrics dashboard and automated weekly curriculum summaries.
 
 ---
 
-## ✨ Features
+## Features
 
-### 🎓 For Students
+### For Students
 
 * **Grounded Context Chat:** Provides answers based off of the uploaded course materials preventing broad-scope AI hallucinations or irrelevant results.
 * **Links you to Course Materials:** Directs students to the exact lecture slides and page numbers where relevant information to their questions exists.
 
-### 👩‍🏫 For Instructors
+### For Instructors
 
 * **Anonymized Analytics Dashboard:** Helps instructors track active student adoption metrics and historical average queries per student.
 * **Live Keyword Distributions:** Shows exactly where students are facing friction through real-time semantic keyword clustering .
@@ -20,19 +20,19 @@ Otter is a **Retrieval-Augmented Generation (RAG)** workspace that unifies cours
 
 ---
 
-## 🎨 Design Language & Theme
+## Design Language & Theme
 
 Otter is styled intentionally around an earthy, focus-driven academic palette configured directly inside Tailwind v4:
 
-* 🟢 **Jade Accent:** `#7B9669` (Action items, highlights, badges)
-* 🪨 **Pebble Light:** `#E6E6E6` (Glassmorphic panels, text container fills)
-* 🌫️ **Slate Mist:** `#6C8480` (Subtle details, timestamps)
-* 🌿 **Sage Border:** `#BAC8B1` (Main viewport workspace backgrounds)
-* 🌲 **Forest Dark:** `#404E3B` (Primary brand typography, core buttons)
+* **Jade Accent:** `#7B9669` (Action items, highlights, badges)
+* **Pebble Light:** `#E6E6E6` (Glassmorphic panels, text container fills)
+* **Slate Mist:** `#6C8480` (Subtle details, timestamps)
+* **Sage Border:** `#BAC8B1` (Main viewport workspace backgrounds)
+* **Forest Dark:** `#404E3B` (Primary brand typography, core buttons)
 
 ---
 
-## 🛠️ Tech Stack & Architecture
+## Tech Stack & Architecture
 
 * **Framework:** [Next.js](https://nextjs.org/) (App Router, Client/Server component splits)
 * **Database & Auth:** [Supabase](https://supabase.com/) (Real-time schema, views, and secure row-level storage tracking)
@@ -41,7 +41,7 @@ Otter is styled intentionally around an earthy, focus-driven academic palette co
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### 1. Configure Local Environment Variables
 
@@ -74,7 +74,7 @@ Open [http://localhost:3000](https://www.google.com/search?q=http://localhost:30
 
 ---
 
-## 📂 Structural Layout Paths
+## Structural Layout Paths
 
 * `app/page.tsx` — Homepage featuring custom real typewriter character loop script.
 * `app/instructor/dashboard/page.tsx` — Aggregated database view tracking analytics.
@@ -83,7 +83,7 @@ Open [http://localhost:3000](https://www.google.com/search?q=http://localhost:30
 
 ---
 
-### 📝 Credits
+### Credits
 
 * Brand typography mapped natively through `'ABeeZee', sans-serif`.
 * Application graphics and main logo sourced cleanly from [Flaticon](https://www.flaticon.com).
